@@ -8,16 +8,13 @@ import {DynamicDialogRef} from 'primeng/dynamicdialog';
   templateUrl: './create-quote.component.html',
   styleUrls: ['./create-quote.component.scss']
 })
-export class CreateQuoteComponent implements OnInit {
+export class CreateQuoteComponent {
 
   public quoteSource: typeof QuoteDataSource = QuoteDataSource;
   public content: string = '';
   public source: QuoteDataSource = QuoteDataSource.XML;
 
   public constructor(private ref: DynamicDialogRef) {
-  }
-
-  public ngOnInit(): void {
   }
 
   public submit(form: NgForm) {
