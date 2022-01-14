@@ -1,0 +1,13 @@
+<div class="header">
+  <h1>Quotes Assignment</h1>
+  <div class="toggle-buttons">
+    <p-toggleButton [(ngModel)]="showXml"
+                    (ngModelChange)="changeFilter()"
+                    onLabel="Hide XML"
+                    offLabel="Show XML"></p-toggleButton>
+    <p-toggleButton [(ngModel)]="showJson"
+                    (ngModelChange)="changeFilter()"
+                    onLabel="Hide JSON"
+                    offLabel="Show JSON"></p-toggleButton>
+  </div>
+</div>

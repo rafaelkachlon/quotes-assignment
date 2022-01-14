@@ -1,0 +1,12 @@
+.header {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+}
+
+::ng-deep {
+  .toggle-buttons .p-togglebutton.p-button {
+    margin: 0 10px;
+  }
+}
