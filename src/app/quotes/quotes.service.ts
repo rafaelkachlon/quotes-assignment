@@ -17,8 +17,8 @@ export class QuotesService {
 
   private xmlUrlPath: string = './assets/xml_source.xml';
   private jsonUrlPath: string = './assets/json_source.json';
-  public filterByJson$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public filterByXml$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private filterByJson$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private filterByXml$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   private activeSources$: Observable<ActiveSources> = combineLatest([this.filterByJson$, this.filterByXml$])
     .pipe(map(([filterByJson, filterByXml]) => this.createActiveSources(filterByJson, filterByXml)));
