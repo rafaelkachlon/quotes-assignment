@@ -25,11 +25,7 @@ export class QuotesService {
         map((response: [QuoteModel[], QuoteModel[]]) => {
           return [...response[0], ...response[1]];
         }),
-        tap(() => this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Data fetched successfully'
-        }))
+        tap(() => this.notifyFetchSucceeded())
       );
   }
 
@@ -45,7 +41,6 @@ export class QuotesService {
       })
     );
   }
-
 
   private getQuotesFromJson(): Observable<any> {
     return this.http.get<QuoteModel[]>(this.jsonUrlPath)
@@ -71,6 +66,14 @@ export class QuotesService {
       severity: 'error',
       summary: 'Error',
       detail: `Something went wrong, couldn't fetch data.`
+    });
+  }
+
+  private notifyFetchSucceeded() {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Data fetched successfully'
     });
   }
 
