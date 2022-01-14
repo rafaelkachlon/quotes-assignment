@@ -1,8 +1,7 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {QuotesService} from '../quotes.service';
-import {QuoteDataSource, QuoteModel} from '../models/quote.model';
-import {Subscription, take} from 'rxjs';
-import {FilterModel} from '../../shared/filter.model';
+import {QuoteModel} from '../models/quote.model';
+import {take} from 'rxjs';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {CreateQuoteComponent} from '../create-quote/create-quote.component';
 import {DynamicDialogConfig} from 'primeng/dynamicdialog/dynamicdialog-config';
@@ -15,27 +14,15 @@ const CreateDialogTitle: string = 'Add a quote';
   styleUrls: ['./quotes.component.scss'],
   providers: [DialogService]
 })
-export class QuotesComponent implements OnInit, OnDestroy {
-  @Input() quoteFilter!: FilterModel;
-  public quotes: QuoteModel[] = [];
-  public subscription!: Subscription;
-  public quoteSource: typeof QuoteDataSource = QuoteDataSource;
-  public showAddBtn: boolean = false;
+export class QuotesComponent implements OnInit {
+  public quotes$ = this.quotesService.filteredQuotes$;
 
   public constructor(private quotesService: QuotesService,
                      private dialogService: DialogService) {
   }
 
   public ngOnInit(): void {
-    this.subscription = this.quotesService.getQuotes()
-      .subscribe(quotes => {
-        this.quotes = quotes;
-        this.showAddBtn = true;
-      });
-  }
-
-  public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.quotesService.fetchQuotes();
   }
 
   public trackByIndex(index: number, _el: any) {
@@ -48,15 +35,8 @@ export class QuotesComponent implements OnInit, OnDestroy {
     dialogRef.onClose.pipe(take(1))
       .subscribe((quote: QuoteModel) => {
         if (!!quote) {
-          this.quotes.push(quote);
-          this.scrollToBottom();
+          this.quotesService.addQuote(quote);
         }
       });
-  }
-
-  private scrollToBottom(): void {
-    setTimeout(() => {
-      window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
-    }, 400);
   }
 }

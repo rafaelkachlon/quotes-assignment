@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FilterPipe} from './filter.pipe';
 import {ToastModule} from 'primeng/toast';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {FormsModule} from '@angular/forms';
@@ -8,9 +7,7 @@ import {DynamicDialogModule} from 'primeng/dynamicdialog';
 
 
 @NgModule({
-  declarations: [
-    FilterPipe
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     FormsModule,
@@ -21,7 +18,6 @@ import {DynamicDialogModule} from 'primeng/dynamicdialog';
 
   exports: [
     FormsModule,
-    FilterPipe,
     ToastModule,
     ToggleButtonModule,
     DynamicDialogModule

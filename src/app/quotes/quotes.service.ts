@@ -1,11 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {catchError, EMPTY, forkJoin, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, EMPTY, forkJoin, map, Observable, take, tap} from 'rxjs';
 import * as xml2js from 'xml2js';
 import {QuoteXmlResponseModel} from './models/quote-xml-response.model';
 import {QuoteDataSource, QuoteModel} from './models/quote.model';
 import {ParserOptions} from 'xml2js';
 import {MessageService} from 'primeng/api';
+
+type ActiveSources = { [key in QuoteDataSource]: boolean }
+type QuotesOfSource = { [key in QuoteDataSource]: QuoteModel[] }
 
 @Injectable({
   providedIn: 'root'
@@ -14,19 +17,55 @@ export class QuotesService {
 
   private xmlUrlPath: string = './assets/xml_source.xml';
   private jsonUrlPath: string = './assets/json_source.json';
+  public filterByJson$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  public filterByXml$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
+  private activeSources$: Observable<ActiveSources> = combineLatest([this.filterByJson$, this.filterByXml$])
+    .pipe(map(([filterByJson, filterByXml]) => this.createActiveSources(filterByJson, filterByXml)));
+
+  private jsonQuotes$: BehaviorSubject<QuoteModel[]> = new BehaviorSubject<QuoteModel[]>([]);
+  private xmlQuotes$: BehaviorSubject<QuoteModel[]> = new BehaviorSubject<QuoteModel[]>([]);
+
+  public filteredQuotes$: Observable<QuoteModel[]> = combineLatest([this.jsonQuotes$, this.xmlQuotes$, this.activeSources$])
+    .pipe(map(([jsonQuotes, xmlQuotes, activeSources]) => {
+      const quotes: QuotesOfSource = {
+        [QuoteDataSource.JSON]: jsonQuotes,
+        [QuoteDataSource.XML]: xmlQuotes
+      };
+      return this.filterBySource(quotes, activeSources);
+    }));
 
   public constructor(private http: HttpClient,
                      private messageService: MessageService) {
   }
 
-  public getQuotes(): Observable<QuoteModel[]> {
-    return forkJoin([this.getQuotesFromJson(), this.getQuotesFromXml()])
+  public fetchQuotes(): void {
+    forkJoin([this.getQuotesFromJson(), this.getQuotesFromXml()])
       .pipe(
-        map((response: [QuoteModel[], QuoteModel[]]) => {
-          return [...response[0], ...response[1]];
-        }),
-        tap(() => this.notifyFetchSucceeded())
-      );
+        take(1),
+        tap(([json, xml]) => {
+          this.jsonQuotes$.next(json);
+          this.xmlQuotes$.next(xml);
+          this.sendFetchSucceededMessage();
+        })
+      ).subscribe();
+  }
+
+  public addQuote(quote: QuoteModel): void {
+    if (quote.source === QuoteDataSource.JSON) {
+      this.jsonQuotes$.next([...this.jsonQuotes$.getValue(), quote]);
+    } else {
+      this.xmlQuotes$.next([...this.xmlQuotes$.getValue(), quote]);
+    }
+    this.sendAddItemSucceededMessage();
+  }
+
+  public toggleSource(source: QuoteDataSource): void {
+    if (source === QuoteDataSource.XML) {
+      this.filterByXml$.next(!this.filterByXml$.getValue());
+    } else {
+      this.filterByJson$.next(!this.filterByJson$.getValue());
+    }
   }
 
   private getQuotesFromXml(): Observable<any> {
@@ -36,7 +75,7 @@ export class QuotesService {
       map((response: string) => this.parseXmlResToJson(response)),
       map((res: QuoteXmlResponseModel) => this.setQuoteSource(res.root?.quote, QuoteDataSource.XML)),
       catchError(() => {
-        this.handleError();
+        this.sendFetchErrorMessage();
         return EMPTY;
       })
     );
@@ -47,7 +86,7 @@ export class QuotesService {
       .pipe(
         map((res: QuoteModel[]) => this.setQuoteSource(res, QuoteDataSource.JSON)),
         catchError(() => {
-          this.handleError();
+          this.sendFetchErrorMessage();
           return EMPTY;
         })
       );
@@ -61,7 +100,7 @@ export class QuotesService {
     return quotes;
   }
 
-  private handleError(): void {
+  private sendFetchErrorMessage(): void {
     this.messageService.add({
       severity: 'error',
       summary: 'Error',
@@ -69,11 +108,19 @@ export class QuotesService {
     });
   }
 
-  private notifyFetchSucceeded() {
+  private sendFetchSucceededMessage(): void {
     this.messageService.add({
       severity: 'success',
       summary: 'Success',
       detail: 'Data fetched successfully'
+    });
+  }
+
+  private sendAddItemSucceededMessage(): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Quote added successfully'
     });
   }
 
@@ -87,5 +134,23 @@ export class QuotesService {
       jsonObj = result;
     });
     return jsonObj;
+  }
+
+  private createActiveSources(filterByJson: boolean, filterByXml: boolean): ActiveSources {
+    const sources: ActiveSources = {
+      [QuoteDataSource.JSON]: filterByJson,
+      [QuoteDataSource.XML]: filterByXml
+    };
+    return sources;
+  }
+
+  private filterBySource(quotes: QuotesOfSource, activeSources: ActiveSources): QuoteModel[] {
+    return Object.keys(activeSources).reduce((acc, key) => {
+      const castedKey = key as QuoteDataSource;
+      if (activeSources[castedKey]) {
+        return [...acc, ...quotes[castedKey]] as QuoteModel[];
+      }
+      return acc;
+    }, [] as QuoteModel[]);
   }
 }

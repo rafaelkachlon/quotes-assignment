@@ -6,7 +6,7 @@ import {QuotesModule} from './quotes/quotes.module';
 import {SharedModule} from './shared/shared.module';
 import {MessageService} from 'primeng/api';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { HeaderComponent } from './header/header.component';
+import {HeaderComponent} from './header/header.component';
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent],
@@ -15,7 +15,7 @@ import { HeaderComponent } from './header/header.component';
     BrowserAnimationsModule,
     HttpClientModule,
     SharedModule,
-    QuotesModule,],
+    QuotesModule],
   providers: [MessageService],
   bootstrap: [AppComponent],
 })

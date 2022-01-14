@@ -4,6 +4,6 @@ export interface QuoteModel {
 }
 
 export enum QuoteDataSource {
-  XML = 'XML',
-  JSON = 'JSON'
+  XML = 'xml',
+  JSON = 'json'
 }

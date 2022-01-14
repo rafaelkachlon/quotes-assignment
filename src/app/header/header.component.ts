@@ -1,5 +1,6 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {FilterEventEmitterModel} from './filter-event-emitter.model';
+import {Component} from '@angular/core';
+import {QuoteDataSource} from '../quotes/models/quote.model';
+import {QuotesService} from '../quotes/quotes.service';
 
 @Component({
   selector: 'app-header',
@@ -10,14 +11,12 @@ export class HeaderComponent {
 
   public showXml: boolean = true;
   public showJson: boolean = true;
+  public quoteDataSource: typeof QuoteDataSource = QuoteDataSource;
 
-  @Output() filterChanged: EventEmitter<FilterEventEmitterModel> = new EventEmitter();
-
-  public constructor() {
+  public constructor(private quoteService: QuotesService) {
   }
 
-  public changeFilter(): void {
-    const event: FilterEventEmitterModel = {showJson: this.showJson, showXml: this.showXml};
-    this.filterChanged.emit(event);
+  public changeFilter(source: QuoteDataSource): void {
+    this.quoteService.toggleSource(source);
   }
 }

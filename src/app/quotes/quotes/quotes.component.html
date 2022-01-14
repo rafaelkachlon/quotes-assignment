@@ -1,8 +1,8 @@
 <div class="quote-container">
-  <ng-container *ngFor="let quote of quotes | filter:quoteFilter;trackBy:trackByIndex;let i = index">
-    <div class="quote" [ngClass]="{'xml': quote.source === quoteSource.XML, 'json': quote.source === quoteSource.JSON}">
+  <ng-container *ngFor="let quote of quotes$ | async">
+    <div class="quote {{quote.source}}">
       {{quote.content}}
     </div>
   </ng-container>
 </div>
-<button class="add-btn" (click)="addNewQuote()" *ngIf="showAddBtn">Add a new quote</button>
+<button class="add-btn" (click)="addNewQuote()">Add a new quote</button>

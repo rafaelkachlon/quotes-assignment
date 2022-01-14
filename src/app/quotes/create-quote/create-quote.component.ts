@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {QuoteDataSource} from '../models/quote.model';
 import {NgForm} from '@angular/forms';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -24,6 +24,6 @@ export class CreateQuoteComponent {
   }
 
   public get quoteSources() {
-    return Object.keys(this.quoteSource);
+    return Object.values(this.quoteSource);
   }
 }

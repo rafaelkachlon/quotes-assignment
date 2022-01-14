@@ -2,11 +2,11 @@
   <h1>Quotes Assignment</h1>
   <div class="toggle-buttons">
     <p-toggleButton [(ngModel)]="showXml"
-                    (ngModelChange)="changeFilter()"
+                    (ngModelChange)="changeFilter(quoteDataSource.XML)"
                     onLabel="Hide XML"
                     offLabel="Show XML"></p-toggleButton>
     <p-toggleButton [(ngModel)]="showJson"
-                    (ngModelChange)="changeFilter()"
+                    (ngModelChange)="changeFilter(quoteDataSource.JSON)"
                     onLabel="Hide JSON"
                     offLabel="Show JSON"></p-toggleButton>
   </div>
