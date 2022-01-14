@@ -1,0 +1,26 @@
+@import "src/variables";
+
+form {
+  display: flex;
+  flex-direction: column;
+
+  .form-control {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+
+  .submit-btn {
+    padding: 5px;
+    border: 1px solid;
+    border-radius: 5px;
+    background-color: $submit-button-bg-color;
+    color: white;
+
+    &:disabled {
+      background-color: lightgray;
+      color: gray;
+      cursor: not-allowed;
+    }
+  }
+}

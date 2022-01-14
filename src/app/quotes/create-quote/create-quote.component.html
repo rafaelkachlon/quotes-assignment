@@ -1,0 +1,14 @@
+<form #createForm="ngForm" (ngSubmit)="submit(createForm)">
+  <div class="form-control">
+    <label for="content">Content:</label>
+    <textarea [(ngModel)]="content" name="content" id="content" cols="30" rows="10" required></textarea>
+  </div>
+  <div class="form-control">
+    <label for="source">Source:</label>
+    <select name="source" id="source" [(ngModel)]="source" required>
+      <option *ngFor="let s of quoteSources" value="{{s}}">{{s}}</option>
+    </select>
+  </div>
+
+  <button class="submit-btn" type="submit" [disabled]="createForm.invalid">Add</button>
+</form>
